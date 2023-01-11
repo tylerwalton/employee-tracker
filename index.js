@@ -47,3 +47,31 @@ function startPrompt () {
     }
   });
 }
+
+
+
+startPrompt()
+
+// functions to query database for viewing department role and employee tables
+
+function viewDepartments () {
+    dbConnection.query ('SELECT * FROM department', (err,res) => {
+        if (err) throw err 
+        console.table(res)
+        startPrompt()
+    })
+};
+function viewEmployees () {
+    dbConnection.query ('SELECT * FROM employee', (err,res) => {
+        if (err) throw err 
+        console.table(res)
+        startPrompt()
+    })
+};
+function viewRoles () {
+    dbConnection.query ('SELECT * FROM role', (err,res) => {
+        if (err) throw err 
+        console.table(res)
+        startPrompt()
+    })
+};
