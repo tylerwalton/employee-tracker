@@ -75,3 +75,35 @@ function viewRoles () {
         startPrompt()
     })
 };
+
+function createEmployee () {
+    dbConnection.query ('select * from role', (err,res)=> {
+        if (err) throw err
+        inquirer.prompt([
+          {
+            type: 'input',
+            name: 'first_name',
+            message: 'What is the employees first name?'
+          },
+          {
+            type: 'input',
+            name: 'last_name',
+            message: 'What is the employees last name?'
+          },
+          {
+            type: 'list',
+            name: 'role-title',
+            message: 'What is the new employees role?',
+            choices: res.map(role => role.title)
+          },
+        ]) .then (data => {
+let roleTitle = res.find(role => role.title === data.role-title)
+            dbConnection.query ('insert into employee set ?', {
+                first_name: data.first_name,
+                last_name: data.last_name,
+                role_id: roleTitle.id 
+            })
+            startPrompt()
+        })
+    })
+}
