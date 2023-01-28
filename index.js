@@ -161,5 +161,41 @@ function createDepartment () {
 // need to select employee whos role we want to change by name and convert to employee id we need to grab the role that we are changing the employee to and convert it to its id and update the employee table with our changes
 
 function updateRole () {
-
+  dbConnection.query("SELECT * FROM employee", (err, empRes) => {
+    if (err) throw (err)
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employee_name",
+          message: "Please select the employees whos role you would like to update",
+          choices: empRes.map (employee => employee.first_name + " " + employee.last_name)
+        },
+      ])
+      .then((data) => {
+// convert employee name to employee id here
+const selectedEmployee = empRes.find((employee) => employee.first_name + " " + employee.last_name === data.employee_name);
+        dbConnection.query("SELECT * FROM role", (err,roleRes) => {
+          if (err) throw err;
+          inquirer.prompt([
+            {
+              type: "list",
+              name: "role_title",
+              message:
+                "Please select the new role for this employee",
+              choices: roleRes.map(
+                (role) => role.title
+              ),
+            },
+          ]) .then (data => {
+            // convert role title to role id
+            const selectedTitle = roleRes.find (role => role.title === data.role_title)
+            dbConnection.query('UPDATE employee SET role_id = ? where id = ?', [selectedTitle.id, selectedEmployee.id], function (err){
+              if (err) throw err
+              startPrompt();
+            })
+          })
+        });
+      });
+  });
 }
