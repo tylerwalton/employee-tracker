@@ -13,7 +13,7 @@ function startPrompt () {
       "View all employees",
       "Create a new department",
       "Create a new role",
-      "Add a new employee",
+      "Create a new employee",
       "Update employee role",
       "Quit"
     ]
@@ -77,33 +77,89 @@ function viewRoles () {
 };
 
 function createEmployee () {
-    dbConnection.query ('select * from role', (err,res)=> {
+    dbConnection.query ('SELECT * FROM role', (err,res)=> {
+        if (err) throw err
+        inquirer
+          .prompt([
+            {
+              type: "input",
+              name: "first_name",
+              message: "What is the employees first name?",
+            },
+            {
+              type: "input",
+              name: "last_name",
+              message: "What is the employees last name?",
+            },
+            {
+              type: "list",
+              name: "roletitle",
+              message: "What is the new employees role?",
+              choices: res.map((role) => role.title),
+            },
+            {
+              type: "list",
+              name: "managerId",
+              message: "What is the managers ID?",
+              choices: [1,2,3] ,
+            },
+          ])
+          .then((data) => {
+            let roleTitle = res.find((role) => role.title === data.roletitle);
+            dbConnection.query("insert into employee set ?", {
+              first_name: data.first_name,
+              last_name: data.last_name,
+              role_id: roleTitle.id,
+              manager_Id : data.managerId
+            });
+            startPrompt();
+          });
+    })
+}
+function createRole () {
+    dbConnection.query ('SELECT * FROM department', (err,res)=> {
         if (err) throw err
         inquirer.prompt([
           {
             type: 'input',
-            name: 'first_name',
-            message: 'What is the employees first name?'
+            name: 'title',
+            message: 'What is the employees title?'
           },
           {
             type: 'input',
-            name: 'last_name',
-            message: 'What is the employees last name?'
+            name: 'salary',
+            message: 'What is the employees starting salary?'
           },
           {
             type: 'list',
-            name: 'role-title',
-            message: 'What is the new employees role?',
-            choices: res.map(role => role.title)
+            name: 'department',
+            message: 'What department is this employee apart of?',
+            choices: res.map(department => department.name)
           },
         ]) .then (data => {
-let roleTitle = res.find(role => role.title === data.role-title)
-            dbConnection.query ('insert into employee set ?', {
-                first_name: data.first_name,
-                last_name: data.last_name,
-                role_id: roleTitle.id 
+let newRole = res.find(department => department.name === data.department)
+            dbConnection.query ('insert into role set ?', {
+                title: data.title, salary: data.salary, department_id: newRole.id
             })
             startPrompt()
         })
     })
+}
+
+function createDepartment () {
+  inquirer.prompt ([
+    {
+      type : "input",
+      name : "department_name",
+      message : "Please provide the name for the new department."
+    }
+  ]) .then (data => {
+    dbConnection.query ('INSERT INTO department SET ?', {name : data.department_name})
+    startPrompt()
+  })
+}
+// need to select employee whos role we want to change by name and convert to employee id we need to grab the role that we are changing the employee to and convert it to its id and update the employee table with our changes
+
+function updateRole () {
+
 }

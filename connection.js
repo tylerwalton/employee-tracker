@@ -1,4 +1,5 @@
-const mySQL = require('mysql2')
+const mySQL = require('mysql2');
+const cTable = require('console.table');
 
 const dbConnection = mySQL.createConnection({
     host: 'localhost',
